@@ -5,24 +5,33 @@ import torch
 
 st.title("Perbandingan Model Deteksi Kanker Kulit")
 
+# Identitas pembuat
+st.markdown("""
+**Aplikasi ini dibuat oleh:**  
+👨‍🎓 **Nama** : Muhammad Firda Satria  
+🆔 **NIM** : 2304130057  
+💻 **Prodi** : Teknik Informatika  
+""")
+
+
 uploaded_file = st.file_uploader("Unggah gambar lesi kulit", type=["jpg", "jpeg", "png"])
 if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, caption="Gambar yang diunggah", use_column_width=True)
 
-    # Ubah path model sesuai dengan direktori model yang telah diunduh
+    # Ganti model_id sesuai model yang ada di Hugging Face hub
     models = {
-        "Vision Transformer": "D:/Kuliah Abangkuh/Semester 4/Kecerdasan Buatan/Projek/model/model1",
-        "ConvNext": "D:/Kuliah Abangkuh/Semester 4/Kecerdasan Buatan/Projek/model/model2"
+        "Vision Transformer": "Anwarkh1/Skin_Cancer-Image_Classification",
+        "ConvNext": "Pranavkpba2000/convnext-fine-tuned-complete-skin-cancer-50epoch"
     }
 
-    for model_name, model_path in models.items():
+    for model_name, model_id in models.items():
         st.subheader(f"Model: {model_name}")
         with st.spinner(f"Memproses dengan {model_name}..."):
-            processor = AutoImageProcessor.from_pretrained(model_path)
-            model = AutoModelForImageClassification.from_pretrained(model_path)
-            inputs = processor(images=image, return_tensors="pt")
+            processor = AutoImageProcessor.from_pretrained(model_id)
+            model = AutoModelForImageClassification.from_pretrained(model_id)
 
+            inputs = processor(images=image, return_tensors="pt")
             with torch.no_grad():
                 outputs = model(**inputs)
                 probs = torch.nn.functional.softmax(outputs.logits, dim=1)
@@ -36,3 +45,19 @@ if uploaded_file:
                 st.write(f"Akurasi Prediksi: **{confidence:.2%}**")
             else:
                 st.write("⚠️ Model tidak cukup yakin untuk melakukan prediksi (akurasi < 50%).")
+
+st.markdown("""
+
+---
+
+### 🧠 Credit
+
+**📦 Model:**  
+- [Vision Transformer by Anwarkh1](https://huggingface.co/Anwarkh1/Skin_Cancer-Image_Classification)  
+- [ConvNext by Pranavkpba2000](https://huggingface.co/Pranavkpba2000/convnext-fine-tuned-complete-skin-cancer-50epoch)
+
+**🤖 Chat Assistant:**  
+- ChatGPT by OpenAI  
+- Gemini by Google
+
+""")
